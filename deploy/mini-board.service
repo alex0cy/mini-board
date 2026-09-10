@@ -1,0 +1,25 @@
+[Unit]
+Description=mini-board — JSON-борда для ИИ-агентов
+After=docker.service network-online.target
+Requires=docker.service
+
+[Service]
+Type=simple
+User=opc
+Restart=always
+RestartSec=10
+
+# Грабля, собранная на боевом хосте: EnvironmentFile даёт переменные docker-КЛИЕНТУ, а не
+# процессу в контейнере. Поэтому тот же файл ещё раз идёт как --env-file.
+EnvironmentFile=/opt/mini-board/env
+
+ExecStartPre=-/usr/bin/docker rm -f mini-board-app
+ExecStart=/usr/bin/docker run --rm --name mini-board-app \
+  --env-file /opt/mini-board/env \
+  -v /opt/mini-board/data:/data \
+  -p 127.0.0.1:8088:8088 \
+  ${MINIBOARD_IMAGE}
+ExecStop=/usr/bin/docker stop -t 15 mini-board-app
+
+[Install]
+WantedBy=multi-user.target

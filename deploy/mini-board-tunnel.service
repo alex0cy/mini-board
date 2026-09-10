@@ -1,0 +1,18 @@
+[Unit]
+Description=mini-board — Cloudflare-туннель (исходящее соединение, портов не открываем)
+After=network-online.target mini-board.service
+Wants=mini-board.service
+
+[Service]
+Type=simple
+User=opc
+Restart=always
+RestartSec=10
+
+# Локально управляемый туннель: конфиг и креденшелы лежат в /opt/mini-board,
+# Zero Trust-дашборд не нужен. Креденшелы (<UUID>.json) и cert.pem — 600.
+ExecStart=/usr/local/bin/cloudflared tunnel --no-autoupdate \
+  --config /opt/mini-board/cloudflared/config.yml run
+
+[Install]
+WantedBy=multi-user.target

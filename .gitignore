@@ -1,0 +1,12 @@
+.venv/
+__pycache__/
+*.pyc
+*.db
+*.db-wal
+*.db-shm
+.pytest_cache/
+env
+*.token
+
+# внутренний ops-документ: IP боевого хоста, торговые счета, чужие секреты
+AGENTS.md

@@ -1,0 +1,21 @@
+# Копия -> /opt/mini-board/cloudflared/config.yml
+# UUID и путь к креденшелам берутся из вывода `cloudflared tunnel create mini-board`.
+tunnel: REPLACE_WITH_TUNNEL_UUID
+credentials-file: /opt/mini-board/cloudflared/REPLACE_WITH_TUNNEL_UUID.json
+
+# Метрики самого туннеля — только на loopback, наружу не отдаём
+metrics: 127.0.0.1:2000
+
+# ОБЯЗАТЕЛЬНО на этом хосте. region1.v2.argotunnel.com резолвится здесь только
+# в AAAA, а IPv6-egress у бокса не работает: с 'auto' cloudflared уходит в IPv6
+# и виснет без внятной ошибки. По IPv4 (198.41.192.0/24:7844) связь есть.
+# Кавычки обязательны: cloudflared ждёт строку и падает с
+# "expected string found int for edge-ip-version", если написать 4 без кавычек.
+edge-ip-version: "4"
+
+ingress:
+  - hostname: board.alex.eu.org
+    service: http://127.0.0.1:8088
+  # Обязательное правило-заглушка: без него cloudflared не стартует.
+  # Всё, что не board.alex.eu.org, получает 404 и до приложения не доходит.
+  - service: http_status:404
